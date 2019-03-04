@@ -57,7 +57,7 @@ weight_f = './weight.json'
 #  w = np.random.randn(dim_w_b, 1)
 w = np.random.randn(dim_w_b, 1)
 w = np.zeros((dim_w_b, 1))
-it, lr = 10000, 429981696 # eval(sys.argv[1]) if len(sys.argv) >= 2 else 300
+it, lr = 10000, 42 # eval(sys.argv[1]) if len(sys.argv) >= 2 else 300
 #it, lr = 10, 3e-10
 prev_gra = np.zeros((18 * 9 + 1, 1)) # adagrad
 
@@ -72,10 +72,10 @@ for i in range(it):
     break
 #  if i % printfreq == printfreq_:
   print("\riteration %6d / %6d : Loss = %.4f" % (i + 1, it, loss), end='\r')
-  if loss < 20 and rec:
+  if loss < 6 and rec:
     print()
     rec = False
-    break
+#break
   grad = -2 * X.T.dot(Y - X.dot(w))
   prev_gra += grad ** 2
   ada = np.sqrt(prev_gra)
