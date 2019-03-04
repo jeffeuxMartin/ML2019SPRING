@@ -51,19 +51,18 @@ X, Y = np.concatenate((feat_x, np.ones((len(feat_x), 1))), axis = 1), feat_y
 
 weight_f = './weight.json'
 
-#if os.path.isfile(weight_f):
-#  w = np.array(json.load(open(weight_f)), dtype='float64').reshape(-1, 1)
-#else:
-#  w = np.random.randn(dim_w_b, 1)
-w = np.random.randn(dim_w_b, 1)
+if os.path.isfile(weight_f):
+  w = np.array(json.load(open(weight_f)), dtype='float64').reshape(-1, 1)
+else:
+  w = np.zeros((dim_w_b, 1))
 w = np.zeros((dim_w_b, 1))
-it, lr = 10000, 42 # eval(sys.argv[1]) if len(sys.argv) >= 2 else 300
+it, lr = 0, eval(sys.argv[1]) if len(sys.argv) >= 2 else 300
 #it, lr = 10, 3e-10
 prev_gra = np.zeros((18 * 9 + 1, 1)) # adagrad
 
 #printfreq = int(sys.argv[1]) if len(sys.argv) >= 2 else 13
 #printfreq_ = printfreq - 1
-rec = True
+rec = 0
 
 print("learning rate =", lr)
 for i in range(it):
@@ -72,9 +71,12 @@ for i in range(it):
     break
 #  if i % printfreq == printfreq_:
   print("\riteration %6d / %6d : Loss = %.4f" % (i + 1, it, loss), end='\r')
-  if loss < 6 and rec:
+  if i % 2000 == 2000 - 1:
     print()
-    rec = False
+  if loss < 8 and rec == 0: print(); rec += 1
+  if loss < 6 and rec == 1: print(); rec += 1
+  if loss < 5 and rec == 2: print(); rec += 1
+  if loss < 4 and rec == 3: print(); rec += 1
 #break
   grad = -2 * X.T.dot(Y - X.dot(w))
   prev_gra += grad ** 2
@@ -82,6 +84,8 @@ for i in range(it):
   w -= lr * grad / ada
   if i % 500 == 0:
     json.dump([w_.item() for w_ in w], open(weight_f,'w'))
+
+print()
 
 tdata, tmp = [], []
 with open('test.csv', 'r', encoding='big5', newline='') as csvf2:
