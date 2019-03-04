@@ -1,11 +1,17 @@
 # numpy, scipy, pandas
 # os, sys, csv, argparse, time, json, glob
 # numpy.linalg.lstsq forbidden
+"""
 def write(ln):
   with open('my_model.py', 'a') as fw:
     fw.write(ln + '\n')
-
+"""
+# Standard Python Libraries
 import csv
+import os
+import sys
+import json
+# Allowed Library
 import numpy as np
 
 data, month, temp, line = [], [], [], []
@@ -16,8 +22,7 @@ with open('train.csv', 'r', encoding='big5', newline='') as csvf:
       continue
     for entry in row[3:]:
       if entry == 'NR':
-        line.append(0)
-#        line.append(-1) # for trying
+        line.append(0) # line.append(-1) # for trying
       else:
         line.append(eval(entry))
     temp.append(line); line = []
@@ -45,31 +50,39 @@ dim_data, dim_w_b = feat_x.shape; dim_w_b += 1
 X, Y = np.concatenate((feat_x, np.ones((len(feat_x), 1))), axis = 1), feat_y
 
 weight_f = './weight.json'
-import json
-import os
-if os.path.isfile(weight_f):
-  w = np.array(json.load(open(weight_f)), dtype='float64').reshape(-1, 1)
-else:
-  w = np.random.randn(dim_w_b, 1)
-it, lr = 100000000, 3e-10
+
+#if os.path.isfile(weight_f):
+#  w = np.array(json.load(open(weight_f)), dtype='float64').reshape(-1, 1)
+#else:
+#  w = np.random.randn(dim_w_b, 1)
+w = np.random.randn(dim_w_b, 1)
+w = np.zeros((dim_w_b, 1))
+it, lr = 10000, 429981696 # eval(sys.argv[1]) if len(sys.argv) >= 2 else 300
 #it, lr = 10, 3e-10
+prev_gra = np.zeros((18 * 9 + 1, 1)) # adagrad
 
-import sys
-printfreq = int(sys.argv[1]) if len(sys.argv) >= 2 else 13
-printfreq_ = printfreq - 1
+#printfreq = int(sys.argv[1]) if len(sys.argv) >= 2 else 13
+#printfreq_ = printfreq - 1
+rec = True
 
+print("learning rate =", lr)
 for i in range(it):
   loss = (sum((Y - X.dot(w)) ** 2) / dim_data) ** 0.5
   if loss > 1e20:
     break
-  if i % printfreq == printfreq_:
-    print("\rTry %6d : Loss = %.4f" % (i + 1, loss), end='\r')
+#  if i % printfreq == printfreq_:
+  print("\riteration %6d / %6d : Loss = %.4f" % (i + 1, it, loss), end='\r')
+  if loss < 20 and rec:
+    print()
+    rec = False
+    break
   grad = -2 * X.T.dot(Y - X.dot(w))
-  w -= lr * grad
+  prev_gra += grad ** 2
+  ada = np.sqrt(prev_gra)
+  w -= lr * grad / ada
   if i % 500 == 0:
     json.dump([w_.item() for w_ in w], open(weight_f,'w'))
 
-# data, month, temp, line = [], [], [], []
 tdata, tmp = [], []
 with open('test.csv', 'r', encoding='big5', newline='') as csvf2:
   rows2 = csv.reader(csvf2)
