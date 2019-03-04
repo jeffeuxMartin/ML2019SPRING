@@ -51,7 +51,7 @@ if os.path.isfile(weight_f):
   w = np.array(json.load(open(weight_f)), dtype='float64').reshape(-1, 1)
 else:
   w = np.random.randn(dim_w_b, 1)
-it, lr = 1000000, 3e-10
+it, lr = 100000000, 3e-10
 
 
 for i in range(it):
