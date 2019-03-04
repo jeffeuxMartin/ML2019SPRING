@@ -52,16 +52,21 @@ if os.path.isfile(weight_f):
 else:
   w = np.random.randn(dim_w_b, 1)
 it, lr = 100000000, 3e-10
+#it, lr = 10, 3e-10
 
+import sys
+printfreq = int(sys.argv[1]) if len(sys.argv) >= 2 else 13
+printfreq_ = printfreq - 1
 
 for i in range(it):
   loss = (sum((Y - X.dot(w)) ** 2) / dim_data) ** 0.5
   if loss > 1e20:
     break
-  print("\rTry %6d : Loss = %.4f" % (i + 1, loss), end='\r')
+  if i % printfreq == printfreq_:
+    print("\rTry %6d : Loss = %.4f" % (i + 1, loss), end='\r')
   grad = -2 * X.T.dot(Y - X.dot(w))
   w -= lr * grad
-  if i % 1000 == 0:
+  if i % 500 == 0:
     json.dump([w_.item() for w_ in w], open(weight_f,'w'))
 
 # data, month, temp, line = [], [], [], []
