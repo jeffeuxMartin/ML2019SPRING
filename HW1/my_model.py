@@ -11,8 +11,12 @@ import csv
 import os
 import sys
 import json
+import time
 # Allowed Library
 import numpy as np
+
+beginning_t = time.time()
+print(time.ctime())
 
 data, month, temp, line = [], [], [], []
 with open('train.csv', 'r', encoding='big5', newline='') as csvf:
@@ -56,9 +60,10 @@ if os.path.isfile(weight_f):
 else:
   w = np.zeros((dim_w_b, 1))
 w = np.zeros((dim_w_b, 1))
-it, lr = 0, eval(sys.argv[1]) if len(sys.argv) >= 2 else 300
+it, lr = 10000000000000, eval(sys.argv[1]) if len(sys.argv) >= 2 else 300
 #it, lr = 10, 3e-10
 prev_gra = np.zeros((18 * 9 + 1, 1)) # adagrad
+prev_loss = 10000000
 
 #printfreq = int(sys.argv[1]) if len(sys.argv) >= 2 else 13
 #printfreq_ = printfreq - 1
@@ -67,16 +72,21 @@ rec = 0
 print("learning rate =", lr)
 for i in range(it):
   loss = (sum((Y - X.dot(w)) ** 2) / dim_data) ** 0.5
+  if loss > prev_loss + 0.1:
+  	break
+  elif loss - prev_loss > 0.0001:
+  	input("\nKeep going?")
   if loss > 1e20:
     break
 #  if i % printfreq == printfreq_:
-  print("\riteration %6d / %6d : Loss = %.4f" % (i + 1, it, loss), end='\r')
-  if i % 2000 == 2000 - 1:
-    print()
-  if loss < 8 and rec == 0: print(); rec += 1
-  if loss < 6 and rec == 1: print(); rec += 1
-  if loss < 5 and rec == 2: print(); rec += 1
-  if loss < 4 and rec == 3: print(); rec += 1
+  print("iteration %14d / %14d : Loss = %.4f               " % (i + 1, it, loss), end='\r')
+  if i % 2500 == 2500 - 1:
+    print('\n                    ^^^^         every 2500 iterations        ', time.ctime(), ' Taking %15.4lf seconds' % (time.time() - beginning_t)); continue
+  if loss < 8 and rec == 0: print('\n                                                   ^ loss == 8', time.ctime(), ' Taking %15.4lf seconds' % (time.time() - beginning_t)); rec += 1; continue
+  if loss < 7 and rec == 1: print('\n                                                   ^ loss == 7', time.ctime(), ' Taking %15.4lf seconds' % (time.time() - beginning_t)); rec += 1; continue
+  if loss < 6 and rec == 2: print('\n                                                   ^ loss == 6', time.ctime(), ' Taking %15.4lf seconds' % (time.time() - beginning_t)); rec += 1; continue
+  if loss < 5 and rec == 3: print('\n                                                   ^ loss == 5', time.ctime(), ' Taking %15.4lf seconds' % (time.time() - beginning_t)); rec += 1; continue
+  print('\r', end='')
 #break
   grad = -2 * X.T.dot(Y - X.dot(w))
   prev_gra += grad ** 2
@@ -105,3 +115,5 @@ with open('prediction.csv', 'w', newline='') as csvfile:
   writer.writerow(['id', 'value'])
   for ct3, row3 in enumerate(res):
     writer.writerow(['id_'+str(ct3), row3.item()])
+print("Prediction done!")
+print('\b' + time.ctime(), ' Taking %15.4lf seconds' % (time.time() - beginning_t))
