@@ -28,7 +28,9 @@ rangin = np.array([feat.max() - feat.min() for feat in data_c])
 s_mean = np.array([feat.mean() for feat in data_c])
 s_stdd = np.array([feat.std() for feat in data_c])
 
-feat_scal_u, feat_scal_s = False, False
+original_pm25 = data_c[9]
+
+feat_scal_u, feat_scal_s = False, True
 if feat_scal_u:
     data_c = np.array([(feat - lowest[n]) / rangin[n]               \
                                    for n, feat in enumerate(data_c)])
@@ -40,25 +42,23 @@ pm25 = data_c[9]
 data = data_c.reshape(18, 12, 20, 24)                               \
                           .transpose(1, 2, 3, 0).reshape(12, 480, 18)
 
-
+# print('='*31+'Check point'+'='*31+'\n')
 
 # data with 12 x 480 x 18
 # pm25 with 12 x 480
 
-feat_x, feat_y = [], []
+feat_x = []
 for month in data:
     # month with 480 x 18
     for hour in range(480 - 10 + 1): # 0 ~ 469
         feat_x.append(month[hour:(hour + 10 - 1)])
-        feat_y.append(month[hour + 10 - 1][9])
 feat_x = np.array(feat_x).reshape(len(feat_x),-1)
-feat_y = np.array(feat_y).reshape(-1, 1)
 # len = 5652
 dim_data, dim_w_b = feat_x.shape; dim_w_b += 1
 X = np.concatenate((feat_x, np.ones((len(feat_x), 1))), axis = 1) 
-Y = feat_y
+Y = np.concatenate(tuple(month[9:] for month in original_pm25)).reshape(-1, 1)
 
-print('='*31+'Check point'+'='*31+'\n')
+# print('='*31+'Check point'+'='*31+'\n')
 
 weight_f = './weight.json'
 
@@ -69,11 +69,12 @@ else:
     w = np.zeros((dim_w_b, 1))
 
 it, lr = 10000, eval(sys.argv[1]) if len(sys.argv) >= 2 else 300
+# lamb = 1e-5
 
 prev_gra = np.zeros(w.shape) # adagrad
 prev_loss = math.inf
 
-print('='*31+'Data Loaded'+'='*31+'\n')
+# print('='*31+'Data Loaded'+'='*31+'\n')
 #### rec = 0
 
 print("learning rate =", lr)
@@ -84,6 +85,10 @@ for i in range(it):
     elif loss - prev_loss > 0.0001:
         print("\nKeep going?")
     if loss > 1e20:
+        break
+    if i == 1000:
+        print()
+    if loss < 20:
         break
     print("\riteration %14d / %14d : Loss = %.4f               "    \
                                        % (i + 1, it, loss), end='\r')
@@ -96,7 +101,7 @@ for i in range(it):
         json.dump([w_.item() for w_ in w], open(weight_f,'w'))
 
 print()
-print('='*28+'Training Finished'+'='*28+'\n')
+# print('='*28+'Training Finished'+'='*28+'\n')
 
 
 with open('test.csv', 'r', encoding='big5', newline='') as f:   
@@ -114,10 +119,6 @@ tdata = tdata_c.transpose(1, 2, 0).reshape(-1, 9 * 18)
 
 tX = np.concatenate((tdata, np.ones((len(tdata), 1))), axis = 1)
 res = tX.dot(w)
-if feat_scal_u:
-    res = res * rangin[9] + lowest[9]
-elif feat_scal_s:
-    res = res * s_mean[9] + s_stdd[9]
 
 with open('prediction.csv', 'w', newline='') as csvfile:
     writer = csv.writer(csvfile)
