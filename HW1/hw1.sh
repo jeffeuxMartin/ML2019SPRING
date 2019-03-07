@@ -1,0 +1,1 @@
+python3 hw1.py train.csv $1 $2 y weight.npy 300 0
