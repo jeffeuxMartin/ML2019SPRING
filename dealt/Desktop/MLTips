@@ -1,0 +1,9 @@
+adaptive lr
+(adagrad)
+//stochastic GD
+//feat scaling
+regularization
+(validation)
+(complex model)
+adam
+(cross valid)
