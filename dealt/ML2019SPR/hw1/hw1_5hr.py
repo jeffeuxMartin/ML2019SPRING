@@ -30,6 +30,7 @@ parser.add_argument("-nw", "--new_weight", help="new weight file", dest="newweig
 args = parser.parse_args()
 
 it, lr, lamb = int(args.it), eval(args.lr), eval(args.lambda_)
+loss_record = []
 
 if os.path.isfile(args.weight):
     if args.weight.split('.')[-1] == 'npy':
@@ -85,7 +86,8 @@ if os.path.isfile(args.train) and (args.mode == 'tr' or args.mode == 'train'):
     print("learning rate =", lr)
     lr_f = np.array([[lr]] * dim_w_b)
     for i in range(it):
-        loss = (sum((Y - X.dot(w)) ** 2) / dim_data) ** 0.5
+        loss = (sum((Y - X.dot(w)) ** 2) / dim_data) ** 0.5 + lamb * sum(w**2)
+        loss_record.append(loss)
         if loss > prev_loss + 0.1:
             break
         elif loss - prev_loss > 0.0001:
@@ -93,7 +95,7 @@ if os.path.isfile(args.train) and (args.mode == 'tr' or args.mode == 'train'):
         if loss > 1e20:
             break
         print("\riteration %14d / %14d : Loss = %.4f               " % (i + 1, it, loss), end='\r')
-        grad = -2 * X.T.dot(Y - X.dot(w))
+        grad = -2 * X.T.dot(Y - X.dot(w)) + 2 * lamb * w
         prev_gra += grad ** 2
         ada = np.sqrt(prev_gra) + 0.005
         w -= lr_f * grad / ada
