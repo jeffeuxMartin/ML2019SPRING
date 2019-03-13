@@ -6,7 +6,7 @@ import sys
 
 title, data = rd('data/X_train')
 num, dim = data.shape
-data_b = np.concatenate((data, np.ones(num).reshape(-1, 1)), 1).astype(int)
+data_b = np.concatenate((data, np.ones(num).reshape(-1, 1)), 1) #.astype(int)
 x = data_b
 
 label, y = rs('data/Y_train')
@@ -32,7 +32,10 @@ for it in range(iterations):
     for dd in range(num):
         loss += -(y[dd]*np.log(fwb(x[dd]))+(1-y[dd])*np.log(1-fwb(x[dd])))
         grad += -(y[dd] - fwb(x[dd]))*x[dd]
-    print("\rTry %3d: loss = %10.7lf"%(it + 1, loss / num), end='\r')
+    res = sigmoid(data_b.dot(w_b))
+    clsed = np.array([1 if ans > 0.5 else 0 for ans in res]).astype(int)
+    acc = 100 - sum(abs(y-clsed)) / num * 100
+    print("\rTry %7d: loss = %12.7lf, Accuracy = %8.4lf%"%(it + 1, loss / num, acc), end='\r')
     w_b -= lr * grad
     if it % 10 == 9:
     	with open('weights/model.npy', 'w') as fw:
@@ -40,7 +43,7 @@ for it in range(iterations):
 
 title_t, data_t = rd('data/X_test')
 num_t, dim_t = data_t.shape
-data_bt = np.concatenate((data_t, np.ones(num_t).reshape(-1, 1)), 1).astype(int)
+data_bt = np.concatenate((data_t, np.ones(num_t).reshape(-1, 1)), 1) #.astype(int)
 
 res_t = sigmoid(data_bt.dot(w_b))
 classed = [1 if ans > 0.5 else 0 for ans in res_t]
