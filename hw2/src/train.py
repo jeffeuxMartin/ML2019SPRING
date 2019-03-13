@@ -14,7 +14,7 @@ label, y = rs('data/Y_train')
 w, b = np.zeros(dim), np.array([0])
 w_b = np.concatenate((w, b))
 # w_b = np.random.random(dim + 1)
-iterations, lr = 100, 8e-15
+iterations, lr = 10000, 8e-15
 if len(sys.argv) > 2:
 	lr, iterations = eval(sys.argv[1]), eval(sys.argv[2])
 elif len(sys.argv) == 2:
@@ -34,8 +34,11 @@ for it in range(iterations):
         grad += -(y[dd] - fwb(x[dd]))*x[dd]
     res = sigmoid(data_b.dot(w_b))
     clsed = np.array([1 if ans > 0.5 else 0 for ans in res]).astype(int)
-    acc = 100 - sum(abs(y-clsed)) / num * 100
-    print("\rTry %7d: loss = %12.7lf, Accuracy = %8.4lf%"%(it + 1, loss / num, acc), end='\r')
+    acc = 1 - sum(abs(y-clsed)) / num
+    print("\rTry %7d: loss = %12.7lf, Score = %.5f "%(it + 1, loss / num, acc), end='')
+    if acc > 0.84434:
+        print(' ==> Simple Baseline Passed??', end='')
+    print('\r', end='')
     w_b -= lr * grad
     if it % 10 == 9:
     	with open('weights/model.npy', 'w') as fw:
@@ -52,3 +55,4 @@ with open('results/prediction_logi.csv', 'w') as fpr:
 	fpr.write('id,label\n')
 	for nw, dt in enumerate(classed):
 		fpr.write(str(nw+1)+','+str(dt)+'\n')
+print()
