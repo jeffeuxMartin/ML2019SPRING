@@ -1,15 +1,13 @@
 import numpy as np
-from data_reader import reader_onehot as rd
-from data_reader import reader_res as rs
-from data_reader import onehotslc
+import data_reader
 import sys
 
-title, data = rd('data/X_train')
+title, data = data_reader.reader_onehot('data/X_train')
 num, dim = data.shape
 data_b = np.concatenate((data, np.ones(num).reshape(-1, 1)), 1) #.astype(int)
 x = data_b
 
-label, y = rs('data/Y_train')
+label, y = data_reader.reader_res('data/Y_train')
 
 w, b = np.zeros(dim), np.array([0])
 w_b = np.concatenate((w, b))
@@ -44,7 +42,7 @@ for it in range(iterations):
     	with open('weights/model.npy', 'w') as fw:
     		np.savetxt(fw, w_b)
 
-title_t, data_t = rd('data/X_test')
+title_t, data_t = data_reader.reader_onehot('data/X_test')
 num_t, dim_t = data_t.shape
 data_bt = np.concatenate((data_t, np.ones(num_t).reshape(-1, 1)), 1) #.astype(int)
 
