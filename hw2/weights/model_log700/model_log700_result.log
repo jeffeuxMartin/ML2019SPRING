@@ -1,0 +1,18 @@
+Model 0 on fold 0, Score = 0.87826  
+Model 1 on fold 0, Score = 0.87921  
+Model 2 on fold 0, Score = 0.88035  
+Model 3 on fold 0, Score = 0.88087  
+Model 0 on fold 1, Score = 0.87878  
+Model 1 on fold 1, Score = 0.87728  
+Model 2 on fold 1, Score = 0.87955  
+Model 3 on fold 1, Score = 0.88026  
+Model 0 on fold 2, Score = 0.88035  
+Model 1 on fold 2, Score = 0.87786  
+Model 2 on fold 2, Score = 0.87930  
+Model 3 on fold 2, Score = 0.88084  
+Model 0 on fold 3, Score = 0.87946  
+Model 1 on fold 3, Score = 0.87826  
+Model 2 on fold 3, Score = 0.88004  
+Model 3 on fold 3, Score = 0.87967  
+
+The model 3 has the highest score: 0.88041.

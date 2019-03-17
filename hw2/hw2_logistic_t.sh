@@ -10,6 +10,6 @@ filenum=1
 while [ -e weights/model_log${filenum}.npy ]; do
 	(( filenum++ ));
 done
-(( filenum-- ));
-# python3 src/logistic.py $3 $4 weights/model_log${filenum}.npy
+
+python3 src/logistic.py $3 $4 weights/model_log${filenum}.npy
 python3 src/testing.py -f weights/feat_scale.npy $5 $6 weights/model_log${filenum}.npy

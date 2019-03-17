@@ -1,7 +1,6 @@
 print()
 import numpy as np
-import pandas as pd
-# import data_reader as dt
+import data_reader as dt
 from argparse import ArgumentParser
 import sys
 from numpy.linalg import inv, det, slogdet
@@ -17,9 +16,8 @@ parser.add_argument("-f", "--feat", help="Feature scaling used.",
                     dest="feat", default="weights/feat_scale.npy")
 parser.add_argument("weights", help="The weights of the model.")
 args = parser.parse_args()
-# print('============================The program starts here...============================')
-# title, data = dt.reader_onehot(args.dataX)
-data = np.array(pd.read_csv(args.dataX))
+print('============================The program starts here...============================')
+title, data = dt.reader_onehot(args.dataX)
 num, dim = data.shape
 mean_, std_ = data.mean(0), data.std(0)
 np.savetxt(args.feat, np.array([mean_, std_]))
@@ -28,9 +26,8 @@ x_ori = data.copy()
 data = (data - mean_) / std_
 x = data
 
-# label, y = dt.reader_res(args.dataY)
-y = np.array(pd.read_csv(args.dataY)).reshape(-1) 
-# print('==============================Finish data loading...==============================')
+label, y = dt.reader_res(args.dataY)
+print('==============================Finish data loading...==============================')
 
 sigmoid = lambda z: np.clip(1.0 / (1.0 + np.exp(-z)), 
                             0.00000000000001, 0.99999999999999)

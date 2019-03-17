@@ -1,6 +1,7 @@
-print('\n==================================Testing starts!==================================')
+# print('\n==================================Testing starts!==================================')
 import numpy as np
-import data_reader as dt
+import pandas as pd
+# import data_reader as dt
 from argparse import ArgumentParser
 import sys
 
@@ -12,7 +13,8 @@ parser.add_argument("-f", "--feat", "--iteration", help="Feature scaling used.",
                     dest="feat", default="")
 
 args = parser.parse_args()
-title, data = dt.reader_onehot(args.dataX)
+data = np.array(pd.read_csv(args.dataX))
+# title, data = dt.reader_onehot(args.dataX)
 num, dim = data.shape
 if args.feat == "":
     x = data
@@ -34,4 +36,4 @@ with open(args.dataY, 'w') as fpr:
 	fpr.write('id,label\n')
 	for nw, dt in enumerate(classed):
 		fpr.write(str(nw+1)+','+str(dt)+'\n')
-print('\n==============================Prediction finished!=================================')
+# print('\n==============================Prediction finished!=================================')
