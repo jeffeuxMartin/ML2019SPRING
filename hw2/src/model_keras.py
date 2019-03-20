@@ -21,7 +21,7 @@ title, y = dr.reader_res('../data/Y_train')
 y_tr, y_te = y[:num//20], y[num//20:]
 
 model = Sequential()
-model.add(Dense(1, input_dim=dim, activation='relu', use_bias=True))
+model.add(Dense(1, input_dim=dim, activation='sigmoid', use_bias=True))
 
 #model.add(Dense(20, input_dim=dim, activation='relu', use_bias=True))
 #model.add(Dense(1, activation='sigmoid', use_bias=True))

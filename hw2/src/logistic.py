@@ -63,10 +63,10 @@ os.mkdir(wfndir + '/' + wfn)
 
 sz = num // folds
 for k in range(folds):
-    x_ft = x_all[k * sz : (k+1) * sz]
-    x_fv = np.concatenate((x_all[:k * sz], x_all[(k+1) * sz:]), 0)
-    y_ft = y_all[k * sz : (k+1) * sz]
-    y_fv = np.concatenate((y_all[:k * sz], y_all[(k+1) * sz:]), 0)
+    x_fv = x_all[k * sz : (k+1) * sz]
+    x_ft = np.concatenate((x_all[:k * sz], x_all[(k+1) * sz:]), 0)
+    y_fv = y_all[k * sz : (k+1) * sz]
+    y_ft = np.concatenate((y_all[:k * sz], y_all[(k+1) * sz:]), 0)
 
     w_b = WBS[k]
     ## functions and helpers
