@@ -63,10 +63,10 @@ os.mkdir(wfndir + '/' + wfn)
 
 sz = num // folds
 for k in range(folds):
-    x_fv = x_all[k * sz : (k+1) * sz]
-    x_ft = np.concatenate((x_all[:k * sz], x_all[(k+1) * sz:]), 0)
-    y_fv = y_all[k * sz : (k+1) * sz]
-    y_ft = np.concatenate((y_all[:k * sz], y_all[(k+1) * sz:]), 0)
+    x_ft = x_all[k * sz : (k+1) * sz]
+    x_fv = np.concatenate((x_all[:k * sz], x_all[(k+1) * sz:]), 0)
+    y_ft = y_all[k * sz : (k+1) * sz]
+    y_fv = np.concatenate((y_all[:k * sz], y_all[(k+1) * sz:]), 0)
 
     w_b = WBS[k]
     ## functions and helpers
@@ -93,8 +93,8 @@ for k in range(folds):
                 grad = -(y-sigmoid(x.dot(w_b))).dot(x) + 2 * lmbda * np.concatenate((w_b[:-1], np.array([0])), 0)
                 prev_momt = beta1 * prev_momt + (1 - beta1) * grad
                 prev_grav = beta2 * prev_grav + (1 - beta2) * grad ** 2
-                momt = prev_momt / (1 - beta1 ** (it + 1))
-                grav = prev_grav / (1 - beta2 ** (it + 1))
+                momt = prev_momt / (1 - beta1)
+                grav = prev_grav / (1 - beta2)
 
                 print("Fold {0:2d} / {1:2d} : ".format(k + 1, folds), end='')
                 print("Iteration {0:4d} / {1:4d} : ".format(it + 1, iterations), end='')
