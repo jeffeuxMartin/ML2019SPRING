@@ -1,7 +1,7 @@
 import keras
 from keras.models import Sequential
-from keras.layers import Dense
-import data_reader as dr
+import keras.layers as layers
+# import data_reader as dr
 import numpy as np
 import pandas as pd
 # import matplotlib.pyplot as plt
@@ -12,16 +12,20 @@ import sys
 
 #np.random.seed(10)
 
-title, data = dr.reader_onehot('../data/X_train')
+data = np.array(pd.read_csv('../../data/X_train'))
 num, dim = data.shape
 x = (data - data.mean(0)) / data.std(0)
 x_tr, x_te = x[:num//20], x[num//20:]
-title, y = dr.reader_res('../data/Y_train')
+y = np.array(pd.read_csv('../../data/Y_train'))
 # y = np_utils.to_categorical(y)
 y_tr, y_te = y[:num//20], y[num//20:]
 
 model = Sequential()
-model.add(Dense(1, input_dim=dim, activation='sigmoid', use_bias=True))
+
+model.add(layers.Dense(1, input_dim=dim, init='uniform', use_bias=True))
+model.add(layers.BatchNormalization())
+model.add(layers.Activation('sigmoid'))
+model.add(layers.Dropout(float(sys.argv[4])))
 
 #model.add(Dense(20, input_dim=dim, activation='relu', use_bias=True))
 #model.add(Dense(1, activation='sigmoid', use_bias=True))
@@ -42,11 +46,11 @@ print()
 print('Accuracy=', scores[1])
 # print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*10))
 
-title, testx = dr.reader_onehot('../data/X_test')
+testx = np.array(pd.read_csv('../../data/X_test'))
 prediction = model.predict((testx-data.mean(0))/data.std(0))
 classed = [1 if ans > 0.5 else 0 for ans in prediction]
 
-with open('../results/pred_keras.csv', 'w') as fpr:
+with open(sys.argv[5], 'w') as fpr:
     print("Predicted!")
     fpr.write('id,label\n')
     for nw, dt in enumerate(classed):
