@@ -22,6 +22,7 @@ x_test, x_test_id = np.array(test_data).T
 x_test = np.concatenate(x_test).reshape(-1, 48, 48, 1).astype('float32') / 255 
 
 files = glob(args.md + '/*.h5')
+print(files)
 for file in files:
     print(file, '......')
     model = load_model(file)
