@@ -10,6 +10,6 @@ curl -O https://github.com/jeffeuxMartin/ML2019SPRING/releases/download/0.0.0/mo
 curl -O https://github.com/jeffeuxMartin/ML2019SPRING/releases/download/0.0.0/model_best_0410_034513.h5
 cd ..
 
-python3 testing.py --testage $1 --models weights --results res
-python3 ensembler.py --results res -outputs $2
+python3 testing.py --testage "$1" --models weights --results res
+python3 ensembler.py --results res --outputs "$2"
 date
