@@ -29,7 +29,7 @@ for file in files:
     print(file, '......')
     model = load_model(file)
     res = model.predict_classes(x_test)
-    with open(args.rs + '/'+os.path.splitext(file)[0]+'prediction_%s.csv'%now_n, 'w') as f:
+    with open(args.rs + '/'+file.split('/')[-1].split('.h5')[0]+'prediction_%s.csv'%now_n, 'w') as f:
             f.write('id,label\n')
             for n, prob in enumerate(res):
                 f.write(str(n) + ',' + str(prob) + '\n')
