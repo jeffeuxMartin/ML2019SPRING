@@ -27,7 +27,8 @@ class Gradienting(object):
         x_v = np.expand_dims(input_image, axis=0)
         gradients = self.compute_grads([x_v])[0][0]
         return gradients
-
+print(sys.argv)
+input()
 train = pd.read_csv(sys.argv[1])
 x = np.array([np.array(pic.split()).astype(int) for pic in train['feature']]).reshape(-1, 48, 48, 1)
 y = np.array(train['label'])
