@@ -18,7 +18,9 @@ args = parser.parse_args()
 test_path = args.te
 if test_path == "": print("Please input your testing data!")
 test_data = [[np.fromstring(entry[1], sep=' '), entry[0]]  for entry in pd.read_csv(test_path).values] 
+
 x_test, x_test_id = np.array(test_data).T 
+print(x_test.shape)
 x_test = np.concatenate(x_test).reshape(-1, 48, 48, 1).astype('float32') / 255 
 
 files = glob(args.md + '/*.h5')
