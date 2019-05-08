@@ -168,6 +168,7 @@ class RNNModel:
     def training(self, prep):
         checkpointer, Early_stopping = self.compile()
         print("Training the model...")
+        history = []
         try:
             history = self.model.fit(
                            prep.trv, prep.lb, 
