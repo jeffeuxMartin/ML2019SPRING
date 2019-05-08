@@ -117,12 +117,12 @@ class Preprocess():
     def get_all_indx(self, pad_sz=None):
         if pad_sz == None:
             pad_sz = self.args.seq_len
-        self.trv = [self.turn_indx(s) for s in self.tr]
+        self.trv = np.vstack([self.turn_indx(s) for s in self.tr])
         # self.trvec = np.zeros((len(self.trv), pad_sz, self.args.word_dim))
         # for ns, s in enumerate(self.trv):
         #     for nw, w in enumerate(s):
         #         self.trvec[ns][nw] = self.vectors[w]
-        self.tev = [self.turn_indx(s) for s in self.te]
+        self.tev = np.vstack([self.turn_indx(s) for s in self.te])
         # self.tevec = np.zeros((len(self.tev), pad_sz, self.args.word_dim))
         # for ns, s in enumerate(self.tev):
         #     for nw, w in enumerate(s):
@@ -142,13 +142,16 @@ class RNNModel:
             weights=[prep.vectors], input_length=args.seq_len, trainable=False))
         self.model.add(LSTM(self.args.hidden_dim, dropout=(1-self.args.dropout), 
                                  recurrent_dropout=(1-self.args.dropout), 
-                                 input_shape=(self.args.seq_len, self.args.word_dim))) 
+                                 # input_shape=(self.args.seq_len, self.args.word_dim)
+                                 ))
         self.model.add(Dense(50, activation='relu')) 
         self.model.add(Dropout(rate=(1-self.args.dropout)))
         self.model.add(Dense(25, activation='relu')) 
         self.model.add(Dropout(rate=(1-self.args.dropout)))
         self.model.add(Dense(1, activation='sigmoid')) 
         self.model.summary()
+        self.prep = prep
+        self.history = ""
 
     def compile(self):
         print("Compiling the model...@{}".format(self.now))
@@ -161,17 +164,18 @@ class RNNModel:
             restore_best_weights=False)
 
         self.model.compile(loss='binary_crossentropy', 
-                           optimizer=Adam(), 
+                           optimizer=Adam(lr=self.args.lr), 
                            metrics=['accuracy']) 
         return checkpointer, early_stopping
 
-    def training(self, prep):
-        checkpointer, Early_stopping = self.compile()
+    def training(self):
+        checkpointer, early_stopping = self.compile()
         print("Training the model...")
-        history = []
+        # history = []
         try:
-            history = self.model.fit(
-                           prep.trv, prep.lb, 
+            print('Start')
+            self.history = self.model.fit(
+                           self.prep.trv, self.prep.lb, 
                            batch_size=self.args.batch,
                            epochs=self.args.epoch, 
                            verbose=1, 
@@ -183,7 +187,7 @@ class RNNModel:
         finally:
             print("Finally Saving the model...")
             self.model.save('model_final_{}.h5'.format(self.now))
-            return history
+            # return history
 
     def Save_pred(self, Y):
         print("Saving the prediction as", 
@@ -198,10 +202,10 @@ class RNNModel:
                     f.write(str(0)) 
                 f.write('\n') 
 
-    def predicting(self):
+    def predicting(self, model_type='best'):
         print("Predicting...")
-        self.model = load_model('model_best_{}.h5'.format(self.now))
-        Y = self.model.predict(test)
+        self.model = load_model('model_{}_{}.h5'.format(model_type, self.now))
+        Y = self.model.predict(self.prep.tev)
         self.Save_pred(Y)
         return Y
 
@@ -230,8 +234,11 @@ if __name__ == "__main__":
     p.get_embedding()
     # p.vectors = np.vstack(p.vectors)
     p.get_all_indx()
-
+    
     nn = RNNModel(args, p)
-    nn.compile()
-    nn.training(p)
-    nn.predicting()
+    # nn.compile()
+    nn.training()
+    try:
+        nn.predicting()
+    except OSError:
+        nn.predicting('final')
