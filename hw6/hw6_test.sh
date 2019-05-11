@@ -7,4 +7,6 @@ wget                       "https://www.dropbox.com/s/n4nzychjeua3v3e/saved_2019
 wget "https://www.dropbox.com/s/rd41i10vkvr8vit/model_best_20190509_095828__20190509_095536.h5?dl=1"
 wget                       "https://www.dropbox.com/s/8s80f9hu9v9du2c/saved_20190509_095536.model?dl=1"
 
+for i in ./*?=1; do mv $i ${i%%\?*}; done
+
 python3 repro.py $1 $2 $3

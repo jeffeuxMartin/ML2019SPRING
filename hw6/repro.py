@@ -15,8 +15,8 @@ args = argstype()
 Ys = {}
 
 if __name__ == '__main__':
-    jieba.load_userdict('dict.txt.big') 
-    test = list(pd.read_csv('test_x.csv')['comment'])
+    jieba.load_userdict(sys.argv[2]) 
+    test = list(pd.read_csv(sys.argv[1])['comment'])
     def tokenize(s): 
         return jieba.lcut(s) 
     P = Pool(processes=4)
@@ -54,4 +54,4 @@ if __name__ == '__main__':
     Yss = list(Ys.values())
     def rei(out): return np.round(sum(out)/len(out))
     o = rei(Yss)
-    with open((str(int(__import__('time').time())))+'.csv', 'w') as ff: ff.write('id,label\n'+''.join([(str(int(n))+','+str(int(w))+'\n') for n,w in enumerate(o)]))
+    with open(sys.argv[3], 'w') as ff: ff.write('id,label\n'+''.join([(str(int(n))+','+str(int(w))+'\n') for n,w in enumerate(o)]))
