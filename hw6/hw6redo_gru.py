@@ -30,7 +30,6 @@ import time as t
 timestamp =t.strftime("%Y%m%d_%H%M%S",t.gmtime(t.time()+8*60*60))
 
 parser = argparse.ArgumentParser()
-# parser.add_argument('model_dir', type=str, help='[Output] Your model checkpoint directory')
 parser.add_argument('train_X',type=str, help='[Input] Your train_x.csv')
 parser.add_argument('train_Y',type=str, help='[Input] Your train_y.csv')
 parser.add_argument('test_X',type=str, help='[Input] Your train_y.csv')

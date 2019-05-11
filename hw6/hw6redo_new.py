@@ -29,6 +29,28 @@ backend.tensorflow_backend._get_available_gpus()
 import time as t
 timestamp =t.strftime("%Y%m%d_%H%M%S",t.gmtime(t.time()+8*60*60))
 
+parser = argparse.ArgumentParser()
+parser.add_argument('train_X',type=str, help='[Input] Your train_x.csv')
+parser.add_argument('train_Y',type=str, help='[Input] Your train_y.csv')
+parser.add_argument('test_X',type=str, help='[Input] Your train_y.csv')
+parser.add_argument('jieba_lib',type=str, help='[Input] Your jieba dict.txt.big')
+
+parser.add_argument('--lr', default=0.001, type=float)
+parser.add_argument('--batch', default=128, type=int)
+parser.add_argument('--epoch', default=10, type=int)
+parser.add_argument('--num_layers', default=1, type=int)
+parser.add_argument('--seq_len', default=30, type=int)
+parser.add_argument('--word_dim', default=100, type=int)
+parser.add_argument('--hidden_dim', default=100, type=int)
+parser.add_argument('--dense_dim', default=50, type=int)
+parser.add_argument('--wndw', default=3, type=int)
+parser.add_argument('--cnt', default=3, type=int)
+parser.add_argument('--dropout', default=0.5, type=float)
+parser.add_argument('--patience', default=8, type=int)
+parser.add_argument('--cont', default="", type=str)
+args = parser.parse_args()
+# main(args)
+
 def timer(func):
     t = __import__("time").time
     def wrap(*args, **kwargs):
@@ -225,28 +247,6 @@ class RNNModel:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    # parser.add_argument('model_dir', type=str, help='[Output] Your model checkpoint directory')
-    # parser.add_argument('jieba_lib',type=str, help='[Input] Your jieba dict.txt.big')
-    # parser.add_argument('train_X',type=str, help='[Input] Your train_x.csv')
-    # parser.add_argument('train_Y',type=str, help='[Input] Your train_y.csv')
-
-    parser.add_argument('--lr', default=0.001, type=float)
-    parser.add_argument('--batch', default=128, type=int)
-    parser.add_argument('--epoch', default=10, type=int)
-    parser.add_argument('--num_layers', default=1, type=int)
-    parser.add_argument('--seq_len', default=30, type=int)
-    parser.add_argument('--word_dim', default=100, type=int)
-    parser.add_argument('--hidden_dim', default=100, type=int)
-    parser.add_argument('--dense_dim', default=50, type=int)
-    parser.add_argument('--wndw', default=3, type=int)
-    parser.add_argument('--cnt', default=3, type=int)
-    parser.add_argument('--dropout', default=0.5, type=float)
-    parser.add_argument('--patience', default=8, type=int)
-    parser.add_argument('--cont', default="", type=str)
-    args = parser.parse_args()
-    # main(args)
-
     p = Preprocess(args)
     p.get_embedding()
     # p.vectors = np.vstack(p.vectors)
