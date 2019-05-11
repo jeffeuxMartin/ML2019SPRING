@@ -62,10 +62,10 @@ class Preprocess():
     @timer
     def __init__(self, 
                  args,
-                 train_path='train_x.csv', 
-                 test_path='test_x.csv', 
-                 label_path='train_y.csv',  
-                 dict_path='dict.txt.big'
+                 train_path=args.train_X, 
+                 test_path=args.test_X, 
+                 label_path=args.train_Y,
+                 dict_path=args.jieba_lib
                 ):
         jieba.load_userdict(dict_path)
         self.tr = pd.read_csv(train_path)['comment']
