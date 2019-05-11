@@ -1,0 +1,1 @@
+python3 hw6redo_gru.py $1 $2 $3 $4 --batch 128 --epoch 50 --word_dim 200 --seq_len 40
