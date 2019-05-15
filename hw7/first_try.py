@@ -91,7 +91,8 @@ decoder = Model(encoded_input, re_decoded)
 autoencoder.compile(
     # optimizer='adadelta', 
 	optimizer='adam', 
-	loss='binary_crossentropy',
+    # loss='binary_crossentropy',
+	loss='mse',
 	metrics=['accuracy'],
 	)
 
