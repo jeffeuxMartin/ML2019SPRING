@@ -97,10 +97,16 @@ autoencoder.compile(
 	)
 
 # input('check')
+Colab = True
+if Colab:
+    from tensorflow.python.keras.callbacks import ModelCheckpoint
+    from tensorflow.python.keras.callbacks import EarlyStopping
+# 	AttributeError
+else:
+    from keras.callbacks import ModelCheckpoint
+    from keras.callbacks import EarlyStopping
 
-from keras.callbacks import ModelCheckpoint
-from keras.callbacks import EarlyStopping
-
+	
 checkpointer = ModelCheckpoint(
         # filepath=('model_best_{}.h5'.format(now)),
         filepath=(sys.argv[1]),
