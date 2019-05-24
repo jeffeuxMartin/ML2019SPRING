@@ -1,64 +1,27 @@
-# bash cluster.sh <images path> <test_case.csv path> <prediction file path>
-# e.g. bash cluster.sh  images/   test_case.csv   ans.csv
+import time, os, sys
 
-# python3 reproduce.py $1 $2 $3
+import numpy as np; np.random.seed(0)
+import pandas as pd
 
-# model_name=`date +"%y%m%d_%H%M%S"`
-# python3 first_try.py "model_${model_name}.h5"
-# python3 repr.py "model_${model_name}.h5" "pred_${model_name}.csv"
-
-
-
-# model_name = !echo `TZ=":Asia/Taipei" date +"%y%m%d_%H%M%S"`
-# model_name = model_name[0]
-import sys
-mysysargv = sys.argv
-model_name = "190521_065402"
-# myJeffname = 'predictions/prediction_{}.csv'.format(model_name)
-myJeffname = mysysargv[3]
-
-import time, os
-import numpy as np
-np.random.seed(0)
 from tensorflow.python.keras import layers, backend as K
 from tensorflow.python.keras.models import Model
 from tensorflow.python.keras.preprocessing import image
-from sklearn.decomposition import PCA
-import pandas as pd
 from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
 
-
-weight_name = mysysargv[4]
-folder = mysysargv[1]
-reload_img = False
-
-total = 40000
-start_time = time.time()
 img = np.zeros((40000, 32, 32, 3))
-# if os.path.isfile('IM.npy') and not reload_img:
-#     img = np.load('IM.npy')
-# if os.path.isfile(mysysargv[1]) and not reload_img:
-    # img = np.load(mysysargv[1])
-# else:
-for number in range(1, total + 1):
+for number in range(1, 40000 + 1):
     print("\rLoading #{:06d}.jpg...".format(number), end='\r')
     img[number - 1] = image.img_to_array(image.load_img(
-        folder + '/%06d.jpg' % number))
-    # np.save('IM_new', arr=img)
-# print(time.time() - start_time, 'seconds...')
+        sys.argv[1] + '/%06d.jpg' % number))
 img = img / 255.
-im = img[0]
 
-latent_dim = 96 # 108 
-PCA_dim = 49 # 64
-
-intermediates = 300, 125 # 250, 125 
+latent_dim = 96 
+PCA_dim = 49 
+intermediates = 300, 125 
 filters = 64, 48, 16
-
 n_iter = 300
-
 epsilon_std = 0.1
-
 batch_size, epochs = 48, 500
 
 def sampling(args):
@@ -66,7 +29,7 @@ def sampling(args):
     epsilon = K.random_normal(shape=(K.shape(z_mean)[0], latent_dim), mean=0., stddev=epsilon_std)
     return z_mean + K.exp(z_log_var) * epsilon
 
-input_img = layers.Input(shape=im.shape)
+input_img = layers.Input(shape=(32, 32, 3))
 x1 = layers.Conv2D(3, (2, 2), activation='relu', padding='same')(input_img)
 x2 = layers.Conv2D(filters[0], (2, 2), strides=(2, 2), activation='relu', padding='same')(x1)
 x3 = layers.MaxPooling2D((2, 2), padding='same')(x2)
@@ -94,15 +57,14 @@ outputimg = layers.Conv2DTranspose(3, (2, 2), strides=1, activation='sigmoid', p
 
 
 autoencoder = Model(input_img, outputimg)
-autoencoder.load_weights(weight_name)
+autoencoder.load_weights(sys.argv[4])
 def encoder(inp): 
-    return K.function([autoencoder.layers[0].input], [autoencoder.layers[12].output])([inp])[0]
+    return K.function([autoencoder.layers[0].input], 
+        [autoencoder.layers[12].output])([inp])[0]
 
 latents = encoder(img)
 
-K.clear_session()
-
-
+# K.clear_session()
 
 pca = PCA(n_components=PCA_dim,
 	      copy=False,
@@ -126,13 +88,11 @@ Origin = kmeans.labels_
 print("original shape:   ", PCALat.shape)
 print("transformed shape:", Origin.shape)
 
-
-# test_file = pd.read_csv('data/test_case.csv')
-test_file = pd.read_csv(mysysargv[2])
+test_file = pd.read_csv(sys.argv[2])
 test_cases = np.stack((test_file['image1_name'].to_numpy(), test_file['image2_name'].to_numpy())).T
 
 compared = [1 if Origin[A - 1] == Origin[B - 1] else 0 for A, B in test_cases]
-with open(myJeffname, 'w') as fw:
+with open(sys.argv[3], 'w') as fw:
     fw.write('id,label\n')
     for _id, _label in enumerate(compared):
         fw.write('{},{}\n'.format(_id, _label))
