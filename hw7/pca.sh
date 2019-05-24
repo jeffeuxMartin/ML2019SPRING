@@ -1,0 +1,1 @@
+python3 tsan.py $1 $2 $3
