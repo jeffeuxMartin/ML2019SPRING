@@ -7,6 +7,8 @@ import numpy as np, pandas as pd; np.random.seed(0)
 import random as rn; rn.seed(12345)
 
 import tensorflow as tf
+from tensorflow.python.keras import backend as K
+
 session_conf = tf.ConfigProto(intra_op_parallelism_threads=1,
                               inter_op_parallelism_threads=1)
 tf.set_random_seed(1234)
@@ -22,7 +24,6 @@ from tensorflow.python.keras.models import Model, Sequential
 
 from tensorflow.python.keras.utils import to_categorical
 from tensorflow.python.keras.optimizers import Adam
-from tensorflow.python.keras import backend as K
 
 
 from pandas import read_csv
@@ -40,23 +41,24 @@ x_test = x_test / 255.
 
 model = Sequential([
     BatchNormalization(input_shape=(48, 48, 1)),
-    Conv2D(32, 5), Activation('relu'), 
-    Conv2D(48, 5), Activation('relu'), 
+    Conv2D(24, 5), Activation('relu'), 
+    Conv2D(36, 5), Activation('relu'), 
     MaxPooling2D(pool_size=(2, 2), strides=(2, 2)),
 
     BatchNormalization(),
-    Conv2D(64, 5), Activation('relu'), 
+    Conv2D(52, 1), Activation('relu'), 
+    DepthwiseConv2D(5, padding='same'), 
     MaxPooling2D(pool_size=(2, 2)),
     Dropout(rate=0.4),
     
     BatchNormalization(),
-    Conv2D(84, 1), Activation('relu'), 
+    Conv2D(64, 1), Activation('relu'), 
     DepthwiseConv2D(5, padding='same'), 
     DepthwiseConv2D(5, padding='same'), 
     MaxPooling2D(pool_size=(2, 2), strides=(2, 2)),
 
     BatchNormalization(),
-    Conv2D(96, 1), Activation('relu'), 
+    Conv2D(84, 1), Activation('relu'), 
     DepthwiseConv2D(5, padding='same'), 
     DepthwiseConv2D(5, padding='same'), 
     MaxPooling2D(pool_size=(2, 2), strides=(2, 2)),
@@ -64,7 +66,7 @@ model = Sequential([
     
     Flatten(),
     
-    Dense(128, activation='relu'), Dropout(rate=0.5),
+    Dense(90, activation='relu'), Dropout(rate=0.5),
     Dense(7, activation='softmax')
 ])
 
