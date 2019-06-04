@@ -1,35 +1,78 @@
-from keras.models import load_model 
-import numpy as np
-from glob import glob as glob
-import time
-import pandas as pd
-import argparse
-import os
-def now_name(): return time.strftime("%m%d_%H%M%S", time.gmtime(time.time() + 8*60*60))
-now_n = now_name()
 
-# test_path = 'data/test.csv'
-parser = argparse.ArgumentParser(description='Process data filenames.')
-parser.add_argument('--testage', '-te', '--te', dest='te', help='', default='')
-parser.add_argument('--models', '-m', '--md', dest='md', help='', default='.')
-parser.add_argument('--results', '-rs', '--rs', dest='rs', help='', default='.')
-args = parser.parse_args()
+# bash  hw8_test.sh  <testing data>  <prediction file>
 
-test_path = args.te
-if test_path == "": print("Please input your testing data!")
-test_data = [[np.fromstring(entry[1], sep=' '), entry[0]]  for entry in pd.read_csv(test_path).values] 
+import time, os, sys
 
-x_test, x_test_id = np.array(test_data).T 
-print(x_test.shape)
-x_test = np.concatenate(x_test).reshape(-1, 48, 48, 1).astype('float32') / 255 
+import numpy as np, pandas as pd; np.random.seed(0)
+import random as rn; rn.seed(12345)
 
-files = glob(args.md + '/*.h5')
-print(files)
-for file in files:
-    print(file, '......')
-    model = load_model(file)
-    res = model.predict_classes(x_test)
-    with open(args.rs + '/'+file.split('/')[-1].split('.h5')[0]+'prediction_%s.csv'%now_n, 'w') as f:
-            f.write('id,label\n')
-            for n, prob in enumerate(res):
-                f.write(str(n) + ',' + str(prob) + '\n')
+import tensorflow as tf
+session_conf = tf.ConfigProto(intra_op_parallelism_threads=1,
+                              inter_op_parallelism_threads=1)
+tf.set_random_seed(1234)
+sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
+K.set_session(sess)
+
+from tensorflow.python.keras.layers import Flatten, Dense, Dropout, Input
+from tensorflow.python.keras.layers import Conv2D, Activation
+from tensorflow.python.keras.layers import BatchNormalization, Reshape
+from tensorflow.python.keras.layers import DepthwiseConv2D
+from tensorflow.python.keras.layers import MaxPooling2D
+from tensorflow.python.keras.models import Model, Sequential
+
+from tensorflow.python.keras.utils import to_categorical
+from tensorflow.python.keras.optimizers import Adam
+from tensorflow.python.keras import backend as K
+
+
+from pandas import read_csv
+from csv import writer
+
+tag_test, x_test = read_csv(sys.argv[1]).to_numpy().T
+
+total_test = len(x_test)
+for i in range(total_test):
+    print('\r', '%7.4lf'%(i / total_test * 100), '%', end='\r')
+    x_test[i] = np.array([int(pixel) 
+        for pixel in x_test[i].split()]).reshape(48, 48, 1) 
+x_test = np.stack(x_test)
+x_test = x_test / 255.
+
+model = Sequential([
+    BatchNormalization(input_shape=(48, 48, 1)),
+    Conv2D(32, 5), Activation('relu'), 
+    Conv2D(48, 5), Activation('relu'), 
+    MaxPooling2D(pool_size=(2, 2), strides=(2, 2)),
+
+    BatchNormalization(),
+    Conv2D(64, 5), Activation('relu'), 
+    MaxPooling2D(pool_size=(2, 2)),
+    Dropout(rate=0.4),
+    
+    BatchNormalization(),
+    Conv2D(84, 1), Activation('relu'), 
+    DepthwiseConv2D(5, padding='same'), 
+    DepthwiseConv2D(5, padding='same'), 
+    MaxPooling2D(pool_size=(2, 2), strides=(2, 2)),
+
+    BatchNormalization(),
+    Conv2D(96, 1), Activation('relu'), 
+    DepthwiseConv2D(5, padding='same'), 
+    DepthwiseConv2D(5, padding='same'), 
+    MaxPooling2D(pool_size=(2, 2), strides=(2, 2)),
+    Dropout(rate=0.4),
+    
+    Flatten(),
+    
+    Dense(128, activation='relu'), Dropout(rate=0.5),
+    Dense(7, activation='softmax')
+])
+
+model.set_weights(np.load(sys.argv[3], allow_pickle=True))
+ans = model.predict(x_test).argmax(1)
+with open(sys.argv[2], 'w') as f:
+    csvwriter = writer(f)
+    f.write('id,label\n')
+    csvwriter.writerows(list(enumerate(ans)))
+
+K.clear_session()

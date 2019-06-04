@@ -15,12 +15,9 @@ from keras.layers import Dropout
 from keras.layers import LeakyReLU
 from keras.layers import BatchNormalization
 from keras.layers import PReLU
-from keras.optimizers import RMSprop
-from keras.optimizers import Adam
+from keras.optimizers import RMSprop, Adam
 from keras.utils import to_categorical
-from keras.callbacks import ModelCheckpoint
-from keras.callbacks import EarlyStopping
-from keras.callbacks import ReduceLROnPlateau
+from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 from keras.preprocessing.image import ImageDataGenerator
 from keras import backend as backend
 
