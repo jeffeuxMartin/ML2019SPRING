@@ -70,7 +70,16 @@ model = Sequential([
     Dense(7, activation='softmax')
 ])
 
-model.set_weights(np.load(sys.argv[3], allow_pickle=True))
+npzFile = np.load(sys.argv[3], allow_pickle=True)
+shapes, contents = npzFile['ws'], npzFile['wt']
+params_rebuild = []
+_start = 0
+for _k in range(len(shapes)):
+    _boundary = np.product(shapes[_k])
+    params_rebuild.append(contents[_start:(_start + _boundary)].reshape(shapes[_k]))
+    _start += _boundary
+model.set_weights(params_rebuild)
+
 ans = model.predict(x_test).argmax(1)
 with open(sys.argv[2], 'w') as f:
     csvwriter = writer(f)
