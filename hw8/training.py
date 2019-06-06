@@ -95,7 +95,7 @@ early_stopping = EarlyStopping(
     restore_best_weights=False)
 
 adam = Adam()
-model.compile(adam, 'mse', metrics=['acc'])
+model.compile(adam, 'categorical_crossentropy', metrics=['acc'])
 model.fit_generator(
     datagen.flow(train_x, y=train_y, batch_size=96),
     epochs=200,
@@ -104,5 +104,8 @@ model.fit_generator(
 
 model.load_weights(sys.argv[2])
 
-np.save(sys.argv[2].split('.')[0], arr=np.array(
-	[_wei.astype(np.float16) for _wei in model.get_weights()]))
+W1 = np.array([_wei.astype(np.float16) for _wei in model.get_weights()])
+ws = np.array([w.shape for w in W1])
+wt = np.concatenate([w.reshape(-1) for w in W1], 0)
+
+np.savez_compressed(sys.argv[2].split('.')[0], wt=wt, ws=ws)
