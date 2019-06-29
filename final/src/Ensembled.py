@@ -18,13 +18,13 @@ from sklearn.feature_extraction.text \
 # from sklearn.neighbors import NearestNeighbors
 
 ################### Parameters ###################
-topicFile = "JeffTopic.json"
-dictFile = "dict.txt.big"
+topicFile = "../model/JeffTopic.json"
+dictFile = "../model/dict.txt.big"
 contentFile = "url2content.json"
-cut_contFile = "Q.json"
-tdFile = "TD.csv"
-qsFile = "QS_1.csv"
-w2vModelFile = "word2vec1500.model"
+cut_contFile = sys.argv[1] # "Q.json"
+tdFile = sys.argv[2] # "TD.csv"
+qsFile = sys.argv[3] # "QS_1.csv"
+w2vModelFile = "../model/word2vec1500.model"
 
 ################# Loading Files ##################
 jieba.set_dictionary(dictFile)
