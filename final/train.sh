@@ -15,4 +15,4 @@ curl -Lb ./cookie "https://drive.google.com/uc?export=download&confirm=`awk '/do
 mv word2vec* models
 
 # bash news TD QS 
-CUDA_VISIBLE_DEVICES="" PYTHONHASHSEED=0 python3 src/Ensembled.py $1 $2 $3
+CUDA_VISIBLE_DEVICES="" PYTHONHASHSEED=0 python3 src/Ensembled.py $1 $2 $3 $4

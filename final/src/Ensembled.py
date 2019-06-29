@@ -155,7 +155,7 @@ for nq, _q in enumerate(QS):
         for _nn in a1: Adjusted[nq][_nn] += 1
         for _nn in a2: Adjusted[nq][_nn] += 2
         for _nn in a3: Adjusted[nq][_nn] += 3
-with open('Rreproduce.csv', 'w') as f:
+with open(sys.argv[4], 'w') as f:
     f.write('Query_Index,' + ','.join(
         'Rank_{:03d}'.format(i + 1) \
             for i in range(300)))
