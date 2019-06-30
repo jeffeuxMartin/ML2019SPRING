@@ -38,41 +38,30 @@ TDQuery, QSQuery = \
     TD.Query.to_list(), QS.Query.to_list()
 NewsDict = dic_content + TDQuery + QSQuery
 
-############## KeyWord weighted W2V ##############
-def extracter(doc):
-    return jieba.analyse.extract_tags(
-        doc, topK=100, withWeight=True)
+# ############### Data Preprocessing ###############
+def tokenize(sentence): 
+    return jieba.lcut(sentence)
 
-with Pool(processes=2) as P:
-    KeywordNewsDict = P.map(extracter, NewsDict)
-P.join()
+if os.path.isfile(cut_contFile):
+    with open(cut_contFile) as f:
+        cut_dic_content = json.load(f)
+else:
+    cut_dic_content = [jieba.lcut(_s) \
+        for _s in dic_content]
+cut_TDQuery = [jieba.lcut(_s) for _s in TDQuery]
+cut_QSQuery = [jieba.lcut(_s) for _s in QSQuery]
+cut_topic = [jieba.lcut(_s) \
+    for _s in dic_topic.values()]
+print(((len(NewsDict)),
+    (len(dic_content), len(TDQuery), len(QSQuery))
+))
+CutDict = cut_dic_content \
+     + cut_TDQuery + cut_QSQuery
+RejoinedDict = [' '.join(sentence) \
+    for sentence in CutDict]
 
-wvmodel =gensim.models.Word2Vec.load(w2vModelFile)
-_vecmean = np.mean(wvmodel.wv.vectors, 0)
-
-def kwaveW2v(_K):
-    if len(_K) == 0:
-        return _vecmean
-    _A = []
-    for _kw, prob in _K:
-        try:
-            _A.append(wvmodel.wv[_kw] * prob)
-        except:
-            _A.append(_vecmean * prob)
-    return sum(_A) \
-        / sum(np.array([eval(_n) \
-        for _n in np.array(_K).T[1]]))
-
-with Pool(processes=2) as P:
-    QK = P.map(kwaveW2v, KeywordNewsDict)
-P.join()
-QK = np.vstack(QK)[:100000]
-QSembed = [kwaveW2v(extracter(_qs)) \
-    for _qs in QSQuery]
-QSembed = np.vstack(QSembed)
-
-ProbKWV = ((QSembed.dot(QK.T) / np.linalg.norm(
-   QK, axis=1)).T / np.linalg.norm(QSembed, axis=1)).T
-# _FF2 = (-ProbKWV).argsort(1).T[:300].T + 1
-np.save('model/prob_kwemb', arr=ProbKWV)
+wvmodel = word2vec.Word2Vec(CutDict, 
+    size=1500, iter=16)
+wvmodel.save(w2vModelFile)
+print("Training done!")
 
