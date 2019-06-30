@@ -24,8 +24,8 @@ cut_contFile =  "model/Q.json"
 tdFile = sys.argv[2] # "TD.csv"
 qsFile = sys.argv[3] # "QS_1.csv"
 
-_R = np.load('prob_tfidf.npy')
-ProbKWV = np.load('prob_kwemb.npy')
+_R = np.load('model/prob_tfidf.npy')
+ProbKWV = np.load('model/prob_kwemb.npy')
 
 #################### Ensemble ####################
 _Rn =(_R - np.min(_R)) / (np.max(_R) - np.min(_R))
