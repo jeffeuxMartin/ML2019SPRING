@@ -25,8 +25,8 @@ from keras import backend as backend
 
 def now_name():
     return time.strftime(
-        "%m%d_%H%M%S", 
-        time.gmtime(time.time() + 8 * 60 * 60)) 
+        "%m%d_%H%M%S",
+        time.gmtime(time.time() + 8 * 60 * 60))
 
 def parsing_arguments():
     parser = argparse.ArgumentParser(
@@ -37,10 +37,10 @@ def parsing_arguments():
     #                     dest='te', help='',
     #                     default='Trainpack/Colab/'\
     #                             'ML HW3/data/test.csv')
-    parser.add_argument('--weight', '-wt', '--wt', 
+    parser.add_argument('--weight', '-wt', '--wt',
                         dest='wt', help='', default='.')
     # parser.add_argument('--results', '-rs', '--rs',
-    #                     dest='rs', help='', 
+    #                     dest='rs', help='',
     #                     default='Trainpack/Colab/'\
     #                             'ML HW3/results/')
     return parser.parse_args()
@@ -111,25 +111,25 @@ model = Sequential()
 model.add(BatchNormalization(input_shape=input_shape))
 model.add(Conv2D(64, (5, 5), padding='same'))
 model.add(LeakyReLU(0.2))
-model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2))) 
+model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
 model.add(Dropout(0.4))
 
 model.add(BatchNormalization(input_shape=input_shape))
 model.add(Conv2D(128, (5, 5), padding='same'))
 model.add(LeakyReLU(0.2))
-model.add(MaxPooling2D(pool_size=(2, 2))) 
+model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.4))
 
 model.add(BatchNormalization(input_shape=input_shape))
 model.add(Conv2D(256, (5, 5), padding='same'))
 model.add(LeakyReLU(0.2))
-model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2))) 
+model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
 model.add(Dropout(0.4))
 
 model.add(BatchNormalization(input_shape=input_shape))
 model.add(Conv2D(256, (5, 5), padding='same'))
 model.add(LeakyReLU(0.2))
-model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2))) 
+model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
 model.add(Dropout(0.4))
 
 model.add(Flatten())
@@ -137,14 +137,14 @@ model.add(Flatten())
 model.add(Dense(256, use_bias=True))
 model.add(LeakyReLU(0.2))
 model.add(Dropout(0.5))
-model.add(Dense(7, activation='softmax'))          
+model.add(Dense(7, activation='softmax'))
 
 now_n = now_name()
 model.compile(optimizer = Adam(lr=1e-3), # 'adam'
               loss = 'categorical_crossentropy',
               metrics = ['accuracy'])
 checkpointer = ModelCheckpoint(
-    filepath=(wght_path + 
+    filepath=(wght_path +\
        '/model_best_{}.h5'.format(now_n)),
     monitor='val_acc', verbose=1, save_best_only=True)
 
@@ -154,7 +154,7 @@ early_stopping = EarlyStopping(
 
 history = model.fit_generator(
     datagen.flow(x_train, y=y_train, batch_size=batch_size),
-    steps_per_epoch=len(x_train) // batch_size, 
+    steps_per_epoch=len(x_train) // batch_size,
     epochs=epochs,
     verbose=1,
     validation_data=(x_val, y_val),
