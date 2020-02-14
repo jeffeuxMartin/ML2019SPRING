@@ -17,23 +17,32 @@ from keras.layers import BatchNormalization
 from keras.layers import PReLU
 from keras.optimizers import RMSprop, Adam
 from keras.utils import to_categorical
-from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
+from keras.callbacks import ModelCheckpoint
+from keras.callbacks import EarlyStopping
+from keras.callbacks import ReduceLROnPlateau
 from keras.preprocessing.image import ImageDataGenerator
 from keras import backend as backend
 
 def now_name():
-    return time.strftime("%m%d_%H%M%S", time.gmtime(time.time() + 8*60*60)) 
+    return time.strftime(
+        "%m%d_%H%M%S", 
+        time.gmtime(time.time() + 8 * 60 * 60)) 
 
 def parsing_arguments():
-    parser = argparse.ArgumentParser(description='Process data filenames.')
-    parser.add_argument('--trainage', '-tr', '--tr', dest='tr', help='', 
-                        default='')
-    # parser.add_argument('--testage', '-te', '--te', dest='te', help='', 
-    #                     default='Trainpack/Colab/ML HW3/data/test.csv')
-    parser.add_argument('--weight', '-wt', '--wt', dest='wt', help='', 
-                        default='.')
-    # parser.add_argument('--results', '-rs', '--rs', dest='rs', help='', 
-    #                     default='Trainpack/Colab/ML HW3/results/')
+    parser = argparse.ArgumentParser(
+        description='Process data filenames.')
+    parser.add_argument('--trainage', '-tr', '--tr',
+                        dest='tr', help='', default='')
+    # parser.add_argument('--testage', '-te', '--te',
+    #                     dest='te', help='',
+    #                     default='Trainpack/Colab/'\
+    #                             'ML HW3/data/test.csv')
+    parser.add_argument('--weight', '-wt', '--wt', 
+                        dest='wt', help='', default='.')
+    # parser.add_argument('--results', '-rs', '--rs',
+    #                     dest='rs', help='', 
+    #                     default='Trainpack/Colab/'\
+    #                             'ML HW3/results/')
     return parser.parse_args()
 
 backend.tensorflow_backend._get_available_gpus()
@@ -55,24 +64,32 @@ training_perc = 10
 
 train_data = [[np.fromstring(entry[1], sep=' '), entry[0]] \
                for entry in pd.read_csv(train_path).values]
-# test_data = [[np.fromstring(entry[1], sep=' '), entry[0]]  \
-               # for entry in pd.read_csv(test_path).values]
+# test_data = [[np.fromstring(entry[1], sep=' '), entry[0]]\
+#                for entry in pd.read_csv(test_path).values]
 
 x_train, y_train = np.array(train_data).T
-x_train = np.concatenate(x_train).reshape(-1, 48, 48, 1).astype('float32') / 255
-x_train, y_train = np.concatenate([x_train[:59], x_train[60:]]), \
-                   np.concatenate([y_train[:59], y_train[60:]])
+x_train = np.concatenate(x_train).reshape(-1, 48, 48, 1)\
+                                    .astype('float32') / 255
+x_train, y_train = np.concatenate(
+                            [x_train[:59], x_train[60:]]), \
+                   np.concatenate(
+                            [y_train[:59], y_train[60:]])
 
 # x_test, x_test_id = np.array(test_data).T
-# x_test = np.concatenate(x_test).reshape(-1, 48, 48, 1).astype('float32') / 255
+# x_test = np.concatenate(x_test).reshape(-1, 48, 48, 1)\
+#                                 .astype('float32') / 255
 
 # Feature scaling???
-# num = x_train.shape[0]; print('...', num, 'samples loaded.')
+# num = x_train.shape[0]
+# print('...', num, 'samples loaded.')
 training_part = int(num * (1 - training_perc / 100))
-x_train, x_val = x_train[:training_part], x_train[training_part:]
-y_train, y_val = y_train[:training_part], y_train[training_part:]
+x_train, x_val = \
+            x_train[:training_part], x_train[training_part:]
+y_train, y_val = \
+            y_train[:training_part], y_train[training_part:]
 
-x_train, y_train = np.concatenate([x_train, np.flip(x_train, 2)]), \
+x_train, y_train = np.concatenate(
+                        [x_train, np.flip(x_train, 2)]), \
                    np.concatenate([y_train, y_train])
 num = x_train.shape[0]
 # print('...', num, 'training samples, and',
@@ -144,4 +161,4 @@ history = model.fit_generator(
     callbacks=[checkpointer, early_stopping])
 
 model.save(wght_path + '/model_final_%s.h5'%now_n)
-                        # creates a HDF5 file Final_'model_done.h5'
+                # creates a HDF5 file Final_'model_done.h5'
